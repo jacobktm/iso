@@ -48,10 +48,6 @@ POST_DISTRO_PKGS+=\
 	system76-dkms
 endif
 
-# DKMS packages on Pop try to build with gcc-12, and it needs to be installed
-#TODO: figure out why this is not already a dependency
-POST_DISTRO_PKGS+=gcc-14
-
 #TODO: rsync is added because it is not depended on by anything except distinst
 # When distinst is removed from the installation, rsync is not available for
 # syncing the recovery partition
