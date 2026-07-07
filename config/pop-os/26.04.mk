@@ -15,8 +15,6 @@ ifeq ($(DISTRO_ARCH),arm64)
 	DISTRO_PARAMS+=ast.modeset=0
 endif
 
-GNOME_INITIAL_SETUP_STAMP=21.04
-
 # DEB822 format system repositories, comment out to disable
 DEB822:=1
 APPS_URI:=http://apt.pop-os.org/proprietary
@@ -47,10 +45,6 @@ POST_DISTRO_PKGS+=\
 	system76-acpi-dkms \
 	system76-dkms
 endif
-
-# DKMS packages on Pop try to build with gcc-12, and it needs to be installed
-#TODO: figure out why this is not already a dependency
-POST_DISTRO_PKGS+=gcc-14
 
 #TODO: rsync is added because it is not depended on by anything except distinst
 # When distinst is removed from the installation, rsync is not available for
