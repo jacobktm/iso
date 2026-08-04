@@ -52,8 +52,15 @@ $(BUILD)/chroot: $(BUILD)/debootstrap
 		CLEAN=1 \
 		/iso/chroot.sh"
 
-	# Copy GPG public key for Pop staging repositories
-	gpg --batch --yes --export "204DD8AEC33A7AFF" | sudo tee "$@.partial/iso/pop-keyring-2017-archive.gpg" > /dev/null
+	# Copy GPG public key for Pop staging repositories. Prefer the host's apt
+	# keyring files (present on Pop/dev hosts); fall back to the user keyring.
+	if [ -f /etc/apt/trusted.gpg.d/pop-keyring-2017-archive.gpg ]; then \
+		sudo cp /etc/apt/trusted.gpg.d/pop-keyring-2017-archive.gpg "$@.partial/iso/pop-keyring-2017-archive.gpg"; \
+	elif [ -f /usr/share/keyrings/pop-archive-keyring.gpg ]; then \
+		sudo cp /usr/share/keyrings/pop-archive-keyring.gpg "$@.partial/iso/pop-keyring-2017-archive.gpg"; \
+	else \
+		gpg --batch --yes --export "204DD8AEC33A7AFF" | sudo tee "$@.partial/iso/pop-keyring-2017-archive.gpg" > /dev/null; \
+	fi
 
 	# Clean APT sources
 	sudo truncate --size=0 "$@.partial/etc/apt/sources.list"
