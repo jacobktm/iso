@@ -187,6 +187,23 @@ $(BUILD)/live: $(BUILD)/chroot
 		CLEAN=1 \
 		/iso/chroot.sh"
 
+	# Install locally-built immutable distinst/pop-installer debs over the
+	# stock pop-os packages pulled in by LIVE_PKGS
+ifneq ($(LOCAL_DEBS),)
+	sudo mkdir -p "$@.partial/iso/local-debs"
+	sudo cp -v $(LOCAL_DEBS)/*.deb "$@.partial/iso/local-debs/"
+	sudo $(CHROOT) "$@.partial" /bin/bash -e -c \
+		"export DEBIAN_FRONTEND=noninteractive; export HOME=/root; apt-get install -y --allow-downgrades /iso/local-debs/*.deb"
+	sudo rm -rf "$@.partial/iso/local-debs"
+endif
+
+	# Install immutable data bundle into the live rootfs so distinst can
+	# provision the CLI, hooks, completions, and man page at install time
+ifneq ($(IMMUTABLE_BUNDLE),)
+	sudo mkdir -p "$@.partial/usr/lib/immutable"
+	sudo cp -a $(IMMUTABLE_BUNDLE)/. "$@.partial/usr/lib/immutable/"
+endif
+
 	# Remove undesired casper script
 	if [ -e "$@.partial/usr/share/initramfs-tools/scripts/casper-bottom/01integrity_check" ]; then \
 		sudo rm -f "$@.partial/usr/share/initramfs-tools/scripts/casper-bottom/01integrity_check"; \
