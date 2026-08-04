@@ -6,6 +6,18 @@ export DEBIAN_FRONTEND=noninteractive
 export HOME=/root
 export LC_ALL=C
 
+# Route package downloads through a build proxy if requested (APT_PROXY is a
+# URL such as http://127.0.0.1:3142). Written early so every apt-get below
+# (update/install/download) uses it.
+if [ -n "${APT_PROXY}" ]; then
+    cat > /etc/apt/apt.conf.d/99-iso-proxy <<EOF
+Acquire::http::Proxy "${APT_PROXY}";
+Acquire::https::Proxy "${APT_PROXY}";
+Acquire::ftp::Proxy "${APT_PROXY}";
+Acquire::Retries "5";
+EOF
+fi
+
 # Generate a machine ID
 if [ -n "$(which dbus-uuidgen)" ]
 then

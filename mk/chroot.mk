@@ -44,7 +44,8 @@ $(BUILD)/chroot: $(BUILD)/debootstrap
 
 	# Install dependencies of chroot script
 	sudo $(CHROOT) "$@.partial" /bin/bash -e -c \
-		"UPDATE=1 \
+		"APT_PROXY=\"$(APT_PROXY)\" \
+		UPDATE=1 \
 		UPGRADE=1 \
 		INSTALL=\"--no-install-recommends gnupg software-properties-common\" \
 		AUTOREMOVE=1 \
@@ -92,7 +93,8 @@ $(BUILD)/chroot: $(BUILD)/debootstrap
 
 	# Run chroot script
 	sudo $(CHROOT) "$@.partial" /bin/bash -e -c \
-		"KEY=\"/iso/pop-keyring-2017-archive.gpg\" \
+		"APT_PROXY=\"$(APT_PROXY)\" \
+		KEY=\"/iso/pop-keyring-2017-archive.gpg\" \
 		STAGING_BRANCHES=\"$(STAGING_BRANCHES)\" \
 		UPDATE=1 \
 		UPGRADE=1 \
@@ -119,7 +121,8 @@ $(BUILD)/chroot: $(BUILD)/debootstrap
 
 	# Rerun chroot script to install POST_DISTRO_PKGS
 	sudo $(CHROOT) "$@.partial" /bin/bash -e -c \
-		"INSTALL=\"$(POST_DISTRO_PKGS)\" \
+		"APT_PROXY=\"$(APT_PROXY)\" \
+		INSTALL=\"$(POST_DISTRO_PKGS)\" \
 		PURGE=\"$(RM_PKGS)\" \
 		AUTOREMOVE=1 \
 		CLEAN=1 \
@@ -127,6 +130,9 @@ $(BUILD)/chroot: $(BUILD)/debootstrap
 
 	# Remove apt preferences
 	sudo rm "$@.partial/etc/apt/preferences.d/pop-iso"
+
+	# Remove the build proxy config so it is not carried into live/pool
+	sudo rm -f "$@.partial/etc/apt/apt.conf.d/99-iso-proxy"
 
 	# Remove workaround for dracut issue on 26.04
 	sudo rmdir --ignore-fail-on-non-empty "$@.partial/lib/modules/$(shell uname -r)"
@@ -179,7 +185,8 @@ $(BUILD)/live: $(BUILD)/chroot
 
 	# Run chroot script
 	sudo $(CHROOT) "$@.partial" /bin/bash -e -c \
-		"KEY=\"/iso/apt-cdrom.gpg\" \
+		"APT_PROXY=\"$(APT_PROXY)\" \
+		KEY=\"/iso/apt-cdrom.gpg\" \
 		STAGING_BRANCHES=\"$(STAGING_BRANCHES)\" \
 		INSTALL=\"$(LIVE_PKGS)\" \
 		PURGE=\"$(RM_PKGS)\" \
@@ -238,6 +245,10 @@ endif
 		sudo touch "$@.partial/etc/NetworkManager/conf.d/10-globally-managed-devices.conf"; \
 	fi
 
+	# Remove the build proxy config so it is not baked into the squashfs (the
+	# installed system uses the immutable runtime proxy detection instead)
+	sudo rm -f "$@.partial/etc/apt/apt.conf.d/99-iso-proxy"
+
 	# Unmount chroot
 	"scripts/unmount.sh" "$@.partial"
 
@@ -277,7 +288,8 @@ $(BUILD)/pool: $(BUILD)/chroot
 
 	# Run chroot script
 	sudo $(CHROOT) "$@.partial" /bin/bash -e -c \
-		"MAIN_POOL=\"$(MAIN_POOL)\" \
+		"APT_PROXY=\"$(APT_PROXY)\" \
+		MAIN_POOL=\"$(MAIN_POOL)\" \
 		RESTRICTED_POOL=\"$(RESTRICTED_POOL)\" \
 		INSTALL=\"$(POOL_PKGS)\" \
 		CLEAN=1 \

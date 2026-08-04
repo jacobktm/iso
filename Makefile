@@ -23,6 +23,10 @@ PROPOSED?=0
 NVIDIA?=0
 HP?=0
 
+# Optional URL (e.g. http://127.0.0.1:3142) used by the chroot's apt-get for
+# package downloads. Passed to scripts/chroot.sh which writes the apt config.
+APT_PROXY?=
+
 # Include automatic variables
 include mk/automatic.mk
 
