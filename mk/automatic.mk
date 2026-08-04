@@ -1,5 +1,14 @@
 BUILD=build/$(DISTRO_CODE)/$(DISTRO_VERSION)/$(DISTRO_ARCH)
 
+# Isolate each variant into its own build tree. The timestamp-based .tag files
+# (chroot/live/pool) would otherwise be considered up-to-date when switching
+# between generic (intel) and NVIDIA builds.
+ifeq ($(NVIDIA),1)
+BUILD:=$(BUILD)/nvidia
+else
+BUILD:=$(BUILD)/intel
+endif
+
 ISO=$(BUILD)/$(ISO_NAME).iso
 TAR=$(BUILD)/$(ISO_NAME).tar
 USB=$(BUILD)/$(ISO_NAME).img

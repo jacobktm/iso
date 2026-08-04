@@ -10,6 +10,13 @@ DISTRO_PARAMS?=
 
 ISO_NAME?=$(DISTRO_CODE)_$(DISTRO_VERSION)_$(DISTRO_ARCH)
 
+# Distinguish the generic and NVIDIA ISO artifacts, like Pop!_OS does
+ifeq ($(NVIDIA),1)
+ISO_NAME:=$(ISO_NAME)_nvidia
+else
+ISO_NAME:=$(ISO_NAME)_intel
+endif
+
 GPG_NAME?=`id -un`
 
 PROPOSED?=0
