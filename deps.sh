@@ -17,7 +17,6 @@ PACKAGES=(
 case "$(dpkg --print-architecture)" in
     amd64)
         PACKAGES+=(
-            qemu-efi
             grub-efi-amd64-signed
             grub-pc-bin
         )
