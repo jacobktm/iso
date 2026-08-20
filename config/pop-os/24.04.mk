@@ -67,6 +67,11 @@ POST_DISTRO_PKGS+=systemd-boot
 # OS for managing the overlay subvolumes
 POST_DISTRO_PKGS+=btrfs-progs
 
+#TODO: Adding some packages that I like having in all of my installs
+POST_DISTRO_PKGS+=git-lfs
+POST_DISTRO_PKGS+=vim
+POST_DISTRO_PKGS+=htop
+
 #TODO: revisit whether these kernel params need to be explicitly invoked
 # This has been hard-set as a short term fix tied to the Nvidia ISOs'
 # inability to successfully reach a GUI session with the state of
@@ -123,6 +128,7 @@ MAIN_POOL=\
 	hdparm \
 	kernelstub \
 	libfl2 \
+	libsodium23 \
 	lm-sensors \
 	pm-utils \
 	pop-hp-vendor \
@@ -137,6 +143,7 @@ MAIN_POOL=\
 	system76-driver \
 	system76-firmware-daemon \
 	system76-wallpapers \
+	vim-runtime \
 	xbacklight
 # TODO: system76-driver deps should be revisited: https://github.com/pop-os/system76-driver/issues/292
 MAIN_POOL+=\
